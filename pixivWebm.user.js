@@ -5,7 +5,7 @@
 // @include     http://www.pixiv.net/member_illust.php*
 // @require     https://cdn.rawgit.com/antimatter15/whammy/9ad3df2f031aa208762b37ea0219da2832f195a0/whammy.js
 // @require     https://cdn.rawgit.com/eligrey/FileSaver.js/765f1d90ae5ec678c28619844293352dfa72092e/FileSaver.min.js
-// @version     0.0.1
+// @version     0.0.2
 // @grant       none
 // @author      livelazily
 // ==/UserScript==
