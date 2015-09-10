@@ -5,18 +5,20 @@
 // @include     http://www.pixiv.net/member_illust.php*
 // @require     https://cdn.rawgit.com/antimatter15/whammy/4effe219137e48787f1e82c8bbc64fbf7b4cfeeb/whammy.js
 // @require     https://cdn.rawgit.com/eligrey/FileSaver.js/e3485a652bc3387b5df9c133c184ae0753cf30de/FileSaver.min.js
-// @version     0.0.3
+// @version     0.1.0
 // @grant       none
 // @author      livelazily
 // ==/UserScript==
+var data = pixiv.context.ugokuIllustFullscreenData;
+if (!data) {
+    return;
+}
 
 var $button = $('<button type="button" class="add-bookmark _button">Get Webm</button>');
 $button.click(function getWebm() {
-    var data = pixiv.context.ugokuIllustData;
     var player = (new pixiv.UgokuIllustPlayer($(""), data, {
-        autoStart: 1,
-        maxWidth: 1920,
-        maxHeight: 1080
+        autoSize: true,
+        autoStart: 1
     }));
 
     var delays = data.frames.map(function (e) {
@@ -25,9 +27,13 @@ $button.click(function getWebm() {
 
     var video = new Whammy.Video();
 
+    $button.text('Downloading images...');
     var timer = setInterval(function () {
-        console.log('waiting for retrieval');
-        if (player.player && player.player._frameImages.length === delays.length) {
+        if (!player.player) {
+            console.log('waiting for retrieval');
+            return;
+        }
+        if (player.player._frameImages.length === delays.length) {
             player = player.player;
             clearInterval(timer);
             player._frameImages.forEach(function (img, i) {
@@ -37,9 +43,15 @@ $button.click(function getWebm() {
             var blobData = video.compile();
             var url = URL.createObjectURL(blobData);
 
-            //alert('finished conversion!')
+            console.log('finished conversion!');
             $('canvas').replaceWith('<video src="' + url + '" autoplay loop>');
-            saveAs(blobData, pixiv.context.illustId + '.webm');
+
+            var fileName = pixiv.context.illustTitle + '[' + pixiv.context.illustId + '].webm';
+            saveAs(blobData, fileName);
+            $button.text('Get Webm');
+        } else {
+            var notDownloadSize = delays.length - player.player._frameImages.length;
+            console.log('still have ' + notDownloadSize + ' images not download');
         }
     }, 1000);
 
